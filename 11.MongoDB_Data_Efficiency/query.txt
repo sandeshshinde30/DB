@@ -1,0 +1,163 @@
+// ================================
+// Title: Efficient Data Filtering in MongoDB
+// Database: customerDB
+// Collection: customers
+// ================================
+
+// Step 1: Switch to the "customerDB" database (or create if it doesn't exist)
+use customerDB;
+
+// ================================
+// Step 2: Create the "customers" collection with sample data
+// ================================
+
+db.customers.insertMany([
+    {
+        _id: 1,
+        name: "John Doe",
+        email: "john@example.com",
+        age: 28,
+        address: {
+            street: "123 Main St",
+            city: "New York",
+            zip: "10001"
+        },
+        active: true,
+        rating: 4.5
+    },
+    {
+        _id: 2,
+        name: "Jane Smith",
+        email: "jane@example.com",
+        age: 32,
+        address: {
+            street: "456 Elm St",
+            city: "Los Angeles",
+            zip: "90001"
+        },
+        active: false,
+        rating: 3.7
+    },
+    {
+        _id: 3,
+        name: "Mike Johnson",
+        email: "mike@example.com",
+        age: 40,
+        address: {
+            street: "789 Oak St",
+            city: "Chicago",
+            zip: "60601"
+        },
+        active: true,
+        rating: 4.8
+    },
+    {
+        _id: 4,
+        name: "Emily Davis",
+        email: "emily@example.com",
+        age: 22,
+        address: {
+            street: "123 Pine St",
+            city: "Seattle",
+            zip: "98101"
+        },
+        active: true,
+        rating: 4.2
+    },
+    {
+        _id: 5,
+        name: "David Wilson",
+        email: "david@example.com",
+        age: 45,
+        address: {
+            street: "456 Maple St",
+            city: "San Francisco",
+            zip: "94101"
+        },
+        active: false,
+        rating: 3.4
+    }
+]);
+
+// ================================
+// Step 3: Efficient Filtering Queries
+// ================================
+
+// Query 1: Find customers who are active
+// Uses a simple equality filter to find all active customers
+db.customers.find({ active: true }).pretty();
+
+// Query 2: Find customers whose age is greater than 30
+// Uses the `$gt` operator for greater than comparison
+db.customers.find({ age: { $gt: 30 } }).pretty();
+
+// Query 3: Find customers whose rating is between 4.0 and 5.0
+// Uses the `$gte` and `$lte` operators to filter a range of ratings
+db.customers.find({ rating: { $gte: 4.0, $lte: 5.0 } }).pretty();
+
+// Query 4: Find customers who live in "New York" or "Chicago" (using `$in` operator)
+db.customers.find({ "address.city": { $in: ["New York", "Chicago"] } }).pretty();
+
+// Query 5: Find customers who have an email ending with "example.com" (using `$regex` operator)
+db.customers.find({ email: { $regex: /example.com$/ } }).pretty();
+
+// Query 6: Find customers who are not active (using `$ne` operator for "not equal")
+db.customers.find({ active: { $ne: true } }).pretty();
+
+// Query 7: Find customers who have a rating higher than 4 and are under 40 years old
+// Combines multiple conditions using `$and`
+db.customers.find({
+    $and: [
+        { rating: { $gt: 4 } },
+        { age: { $lt: 40 } }
+    ]
+}).pretty();
+
+// Query 8: Find customers who have a zip code starting with "9" (using `$regex`)
+db.customers.find({ "address.zip": { $regex: "^9" } }).pretty();
+
+// ================================
+// Step 4: Indexing for Efficient Queries
+// ================================
+
+// Create an index on "email" field to speed up search queries on email
+db.customers.createIndex({ email: 1 });
+
+// Create an index on "rating" field for efficient querying on ratings
+db.customers.createIndex({ rating: -1 });
+
+// Query 9: Find customers with a rating higher than 4.0, now with indexing applied
+db.customers.find({ rating: { $gt: 4.0 } }).pretty();
+
+// Query 10: Find customers who are active and age greater than 30, using compound index
+db.customers.createIndex({ active: 1, age: 1 });
+db.customers.find({ active: true, age: { $gt: 30 } }).pretty();
+
+// ================================
+// Step 5: Using Projection to Optimize Results
+// ================================
+
+// Query 11: Find all active customers and return only their name and email (using projection)
+db.customers.find({ active: true }, { name: 1, email: 1, _id: 0 }).pretty();
+
+// Query 12: Find customers aged 30 or more, and exclude the email field from the result
+db.customers.find({ age: { $gte: 30 } }, { email: 0 }).pretty();
+
+// ================================
+// Step 6: Using Aggregation Framework for More Complex Filtering
+// ================================
+
+// Query 13: Find the average rating of all customers (using aggregation)
+db.customers.aggregate([
+    { $group: { _id: null, avgRating: { $avg: "$rating" } } }
+]);
+
+// Query 14: Find customers and their corresponding rating counts (using aggregation)
+db.customers.aggregate([
+    { $group: { _id: "$rating", count: { $sum: 1 } } }
+]);
+
+// ================================
+// End of MongoDB Filtering Script
+// ================================
+

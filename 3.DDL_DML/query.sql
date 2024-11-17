@@ -98,4 +98,4 @@ DELETE FROM DEPARTMENT WHERE DEPTNO = 4;
 -- 6. SELECT: Retrieves data from the table.
 -- 7. UPDATE: Modifies existing rows of data in the table.
 -- 8. DELETE: Removes specific rows of data from the table.
--- ========================================================
+-- ======================================================== +

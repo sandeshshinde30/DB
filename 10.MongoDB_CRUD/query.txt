@@ -1,0 +1,167 @@
+// ================================
+// Title: MongoDB CRUD Operations
+// Database: customerDB
+// Collection: customers
+// ================================
+
+// Step 1: Switch to or create the database named "customerDB"
+use customerDB;
+
+// ================================
+// Step 2: Create the "customers" collection and insert sample documents
+// ================================
+
+db.customers.insertMany([
+    {
+        _id: 1,
+        name: "John Doe",
+        email: "john@example.com",
+        age: 28,
+        address: {
+            street: "123 Main St",
+            city: "New York",
+            zip: "10001"
+        },
+        active: true
+    },
+    {
+        _id: 2,
+        name: "Jane Smith",
+        email: "jane@example.com",
+        age: 32,
+        address: {
+            street: "456 Elm St",
+            city: "Los Angeles",
+            zip: "90001"
+        },
+        active: false
+    },
+    {
+        _id: 3,
+        name: "Mike Johnson",
+        email: "mike@example.com",
+        age: 40,
+        address: {
+            street: "789 Oak St",
+            city: "Chicago",
+            zip: "60601"
+        },
+        active: true
+    }
+]);
+
+// ================================
+// Step 3: Read Operations (DQL - Data Query Language)
+// ================================
+
+// Retrieve all documents from the "customers" collection
+db.customers.find().pretty();
+
+// Find a specific customer by name
+db.customers.find({ name: "Jane Smith" }).pretty();
+
+// Find customers who are active (active: true)
+db.customers.find({ active: true }).pretty();
+
+// Find customers whose age is greater than 30
+db.customers.find({ age: { $gt: 30 } }).pretty();
+
+// Project specific fields (only display name and email, exclude _id)
+db.customers.find({}, { name: 1, email: 1, _id: 0 }).pretty();
+
+// ================================
+// Step 4: Update Operations (DML - Data Manipulation Language)
+// ================================
+
+// Update the email of "John Doe"
+db.customers.updateOne(
+    { name: "John Doe" },
+    { $set: { email: "john.doe@newemail.com" } }
+);
+
+// Increment the age of all active customers by 1
+db.customers.updateMany(
+    { active: true },
+    { $inc: { age: 1 } }
+);
+
+// Add a new field "membership" to "Jane Smith"
+db.customers.updateOne(
+    { name: "Jane Smith" },
+    { $set: { membership: "Gold" } }
+);
+
+// ================================
+// Step 5: Delete Operations (DML - Data Manipulation Language)
+// ================================
+
+// Delete a specific customer by name
+db.customers.deleteOne({ name: "Mike Johnson" });
+
+// Delete all inactive customers (active: false)
+db.customers.deleteMany({ active: false });
+
+// Drop the entire "customers" collection
+db.customers.drop();
+
+// ================================
+// Step 6: Additional Operations
+// ================================
+
+// Count the number of active customers
+db.customers.countDocuments({ active: true });
+
+// Sort customers by age in descending order
+db.customers.find().sort({ age: -1 }).pretty();
+
+// ================================
+// Step 7: Indexing
+// ================================
+
+// Create an index on the "email" field for faster search queries
+db.customers.createIndex({ email: 1 });
+
+// ================================
+// Step 8: Additional Aggregation Queries
+// ================================
+
+// Group customers by age and get the count of customers for each age group
+db.customers.aggregate([
+    { $group: { _id: "$age", count: { $sum: 1 } } }
+]);
+
+// Get the average age of all customers
+db.customers.aggregate([
+    { $group: { _id: null, averageAge: { $avg: "$age" } } }
+]);
+
+// ================================
+// Step 9: Commit (Implicit in MongoDB)
+// ================================
+
+// Note: MongoDB automatically commits changes after each operation.
+// No explicit COMMIT command is required, unlike in SQL databases.
+
+// ================================
+// Step 10: Rollback (Manual Rollback Example)
+// ================================
+
+// To manually undo an operation, you would need to restore the previous state.
+// Example: Re-insert a deleted document (Mike Johnson)
+db.customers.insertOne({
+    _id: 3,
+    name: "Mike Johnson",
+    email: "mike@example.com",
+    age: 40,
+    address: {
+        street: "789 Oak St",
+        city: "Chicago",
+        zip: "60601"
+    },
+    active: true
+});
+
+// ================================
+// End of MongoDB Script
+// ================================
+

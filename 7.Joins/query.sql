@@ -135,4 +135,18 @@ SELECT *
 FROM Sailors
 NATURAL JOIN Reserves;
 
+
+
 -- End of SQL script.
+
+-- Simulating FULL OUTER JOIN using LEFT JOIN, RIGHT JOIN, and UNION.
+SELECT S.sid, S.sname, R.bid
+FROM Sailors S
+LEFT JOIN Reserves R ON S.sid = R.sid
+
+UNION
+
+SELECT S.sid, S.sname, R.bid
+FROM Sailors S
+RIGHT JOIN Reserves R ON S.sid = R.sid;
+
